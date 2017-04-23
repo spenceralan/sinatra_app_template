@@ -106,7 +106,9 @@ Installation is quick and easy! First you can open this link <!--HEROKU LINK HER
 Copyright © 2017 <!--YOUR NAME HERE-->
 TEXT
 
-    write_contents lib_path, "#{project_name}.rb"
+    write_contents lib_path, "#{project_name}.rb", <<-TEXT
+# backend ruby code goes here
+TEXT
 
     write_contents spec_path, "#{project_name}_spec.rb"
 
