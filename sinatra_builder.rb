@@ -98,3 +98,6 @@ new_project.build_files
 puts "Building #{project_name}........"
 
 `BUNDLE_GEMFILE=#{new_project.project_path}/Gemfile bundle install`
+
+puts "#{new_project.project_name} built at:"
+puts new_project.project_path
