@@ -160,7 +160,20 @@ set(:show_exceptions, false)
 # end
 TEXT
 
-    write_contents views_path, "index.erb"
+    write_contents views_path, "index.erb", <<-TEXT
+<%= # sample index html
+# <form action="/phrase_parser">
+#   <div class="form-group">
+#      <label for="title">gimme phrase or word!</label>
+#      <input name="phrase1" class="form-control" type="text">
+#      <label for="title">gimme another!</label>
+#      <input name="phrase2" class="form-control" type="text">
+#   </div>
+#   <hr>
+#   <button action="/" class="btn btn-success">what am i?</button>
+# </form>
+%>
+TEXT
 
     write_contents views_path, "layout.erb", <<-TEXT
 <!DOCTYPE html>
@@ -182,7 +195,13 @@ TEXT
 </html>
 TEXT
 
-    write_contents views_path, "output.erb"
+    write_contents views_path, "output.erb", <<-TEXT
+<%= # sample output html
+# <h2><%= @message %></h2>
+# <hr>
+# <a href="/" class="btn btn-danger">reset</a>
+%>
+TEXT
 
     write_contents css_path, "styles.css"
 
