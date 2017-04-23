@@ -6,9 +6,9 @@ Pull requests and forks are encouranged! This is just a template but feel free t
 
 ### Prerequisites
 
-Mac
-Ruby 
-Bundler
+* Mac
+* Ruby 
+* Bundler
 
 ### Installing
 
