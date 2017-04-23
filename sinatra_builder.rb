@@ -48,7 +48,10 @@ get('/') do
 end
 TEXT
 
-    write_contents project_path, "config.ru"
+    write_contents project_path, "config.ru", <<-TEXT
+require ('./app')
+run Sinatra::Application
+TEXT
 
     write_contents project_path, "Gemfile", <<-TEXT
 source "https://rubygems.org"
@@ -90,12 +93,14 @@ project_name.gsub!(/\s/, "_")
 project_name.gsub!(/\W/, "")
 project_name = "project" if project_name == ""
 
+puts "Building #{project_name}........"
+
 new_project = ProjectBuilder.new(project_name)
 
 new_project.build_folders
 new_project.build_files
 
-puts "Building #{project_name}........"
+puts "Running bundler........"
 
 `BUNDLE_GEMFILE=#{new_project.project_path}/Gemfile bundle install`
 
