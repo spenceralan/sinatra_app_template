@@ -10,6 +10,7 @@ class ProjectBuilder
   attr_accessor :css_path
   attr_accessor :img_path
   attr_accessor :js_path
+  attr_accessor :config_path
 
   def initialize(project)
     self.project_name = project
@@ -20,10 +21,11 @@ class ProjectBuilder
     self.css_path = File.join(project_path, "public/css")
     self.img_path = File.join(project_path, "public/img")
     self.js_path = File.join(project_path, "public/js")
+    self.config_path = File.join(project_path, "config")
   end
 
   def build_folders
-    [lib_path, spec_path, views_path, css_path, img_path, js_path].each do |folder|
+    [lib_path, spec_path, views_path, css_path, img_path, js_path, config_path].each do |folder|
       FileUtils.mkdir_p(folder)
     end
   end
@@ -36,20 +38,20 @@ class ProjectBuilder
 
   def build_files
     write_contents project_path, "app.rb", <<-TEXT
-require 'sinatra'
-require 'sinatra/reloader'
-require './lib/#{project_name}'
-require 'pry'
+require "sinatra"
+require "sinatra/reloader"
+require "./lib/#{project_name}"
+require "pry"
 
-also_reload('lib/**/*.rb')
+also_reload "lib/**/*.rb"
 
-get('/') do
-  erb(:index)
+get "/" do
+  erb :index
 end
 TEXT
 
     write_contents project_path, "config.ru", <<-TEXT
-require ('./app')
+require "./app"
 run Sinatra::Application
 TEXT
 
@@ -59,9 +61,20 @@ source "https://rubygems.org"
 
 gem "sinatra"
 gem "sinatra-contrib"
+gem "sinatra-activerecord"
+gem "rake"
 gem "rspec"
 gem "capybara"
 gem "pry"
+TEXT
+
+    write_contents project_path, "Rakefile", <<-TEXT
+require "sinatra/activerecord"
+require "sinatra/activerecord/rake"
+
+namespace :db do
+  task :load_config
+end
 TEXT
 
     write_contents project_path, "README.md", <<-TEXT
@@ -91,12 +104,6 @@ Installation is quick and easy! First you can open this link <!--HEROKU LINK HER
 * ES6
 * Jquery https://jquery.com/
 
-## Specifications
-
-| behavior |  input   |  output  |
-|----------|:--------:|:--------:|
-<!--SPECS GO HERE-->
- 
 ## Authors
 
 * <!--YOUR NAME HERE-->
@@ -127,25 +134,8 @@ SOFTWARE.
 
 TEXT
 
-    write_contents lib_path, "#{project_name}.rb", <<-TEXT
-# example ruby code
-
-# class Palindrome
-
-#   def is_word?(user_input)
-#     user_input.match?(/[aeiouy]+/i)
-#   end
-
-# end
-TEXT
-
     write_contents spec_path, "#{project_name}_spec.rb", <<-TEXT
-require "#{project_name}"
-require "rspec"
-require "pry"
-
-
-# example project spec
+require "spec_helper"
 
 # describe 'Palindrome#isWord?' do
 #   let(:word) { Palindrome.new }
@@ -163,12 +153,11 @@ TEXT
 
     write_contents spec_path, "#{project_name}_integration_spec.rb", <<-TEXT
 require "capybara/rspec"
+require "spec_helper"
 require "./app"
 
 Capybara.app = Sinatra::Application
 set(:show_exceptions, false)
-
-# example integration test
 
 # describe("the phrase parser path", {:type => :feature}) do
 #   it("processes the user input and returns correct message if its a palindrome") do
@@ -181,19 +170,22 @@ set(:show_exceptions, false)
 # end
 TEXT
 
-    write_contents views_path, "index.erb", <<-TEXT
-<%= # sample index html
-# <form action="/phrase_parser">
-#   <div class="form-group">
-#      <label for="title">gimme phrase or word!</label>
-#      <input name="phrase1" class="form-control" type="text">
-#      <label for="title">gimme another!</label>
-#      <input name="phrase2" class="form-control" type="text">
-#   </div>
-#   <hr>
-#   <button action="/" class="btn btn-success">what am i?</button>
-# </form>
-%>
+  write_contents spec_path, "spec_helper.rb", <<-TEXT
+ENV["RACK_ENV"] = "test"
+
+require "rspec"
+require "pg"
+require "pry"
+require "sinatra/activerecord"
+require "#{project_name}"
+
+# RSpec.configure do |config|
+#   config.after(:each) do
+#     Department.all.each do |d|
+#       d.destroy
+#     end
+#   end
+# end
 TEXT
 
     write_contents views_path, "layout.erb", <<-TEXT
@@ -216,17 +208,22 @@ TEXT
 </html>
 TEXT
 
-    write_contents views_path, "output.erb", <<-TEXT
-<%= # sample output html
-# <h2><%= @message %></h2>
-# <hr>
-# <a href="/" class="btn btn-danger">reset</a>
-%>
-TEXT
-
     write_contents css_path, "styles.css"
 
     write_contents js_path, "scripts.js"
+
+    write_contents views_path, "index.erb"
+
+    write_contents lib_path, "#{project_name}.rb"
+
+    write_contents config_path, "database.yml", <<-TEXT
+development:
+  adapter: postgresql
+  database: #{project_name}_development
+test:
+  adapter: postgresql
+  database: #{project_name}_test
+TEXT
 
   end
   
