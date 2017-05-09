@@ -29,7 +29,7 @@ class ProjectBuilder
       FileUtils.mkdir_p(folder)
     end
   end
-  
+
   def write_contents(path, filename, contents = "")
     File.open(File.join(path, filename), "w") do |f|
       f.write(contents)
@@ -40,6 +40,7 @@ class ProjectBuilder
     write_contents project_path, "app.rb", <<-TEXT
 require "sinatra"
 require "sinatra/reloader"
+require "sinatra/activerecord"
 require "./lib/#{project_name}"
 require "pry"
 
@@ -62,6 +63,7 @@ source "https://rubygems.org"
 gem "sinatra"
 gem "sinatra-contrib"
 gem "sinatra-activerecord"
+gem "pg"
 gem "rake"
 gem "rspec"
 gem "capybara"
@@ -226,7 +228,7 @@ test:
 TEXT
 
   end
-  
+
 end
 
 puts "What is the name of your project?"
