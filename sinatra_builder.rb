@@ -59,13 +59,17 @@ TEXT
 source "https://rubygems.org"
 # ruby "2.4.1"
 
-gem "sinatra"
-gem "sinatra-contrib"
+gem "sinatra-contrib", require: "sinatra/reloader"
 gem "sinatra-activerecord"
 gem "rake"
-gem "rspec"
-gem "capybara"
-gem "pry"
+gem "pg"
+gem "sinatra"
+
+group :test do
+  gem "rspec"
+  gem "capybara"
+  gem "pry"
+end
 TEXT
 
     write_contents project_path, "Rakefile", <<-TEXT
