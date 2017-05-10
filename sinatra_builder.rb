@@ -38,13 +38,9 @@ class ProjectBuilder
 
   def build_files
     write_contents project_path, "app.rb", <<-TEXT
-require "sinatra"
-require "sinatra/reloader"
-require "sinatra/activerecord"
-require "./lib/#{project_name}"
-require "pry"
-
-also_reload "lib/**/*.rb"
+require "bundler/setup"
+Dir[File.dirname(__FILE__) + '/lib/*.rb'].each { |file| require file }
+Bundler.require :default
 
 get "/" do
   erb :index
@@ -62,7 +58,6 @@ source "https://rubygems.org"
 
 gem "sinatra-contrib", require: "sinatra/reloader"
 gem "sinatra-activerecord"
-gem "pg"
 gem "rake"
 gem "pg"
 gem "sinatra"
@@ -158,12 +153,7 @@ require "spec_helper"
 TEXT
 
     write_contents spec_path, "#{project_name}_integration_spec.rb", <<-TEXT
-require "capybara/rspec"
 require "spec_helper"
-require "./app"
-
-Capybara.app = Sinatra::Application
-set(:show_exceptions, false)
 
 # describe("the phrase parser path", {:type => :feature}) do
 #   it("processes the user input and returns correct message if its a palindrome") do
@@ -179,11 +169,15 @@ TEXT
   write_contents spec_path, "spec_helper.rb", <<-TEXT
 ENV["RACK_ENV"] = "test"
 
-require "rspec"
-require "pg"
-require "pry"
-require "sinatra/activerecord"
-require "#{project_name}"
+require "bundler/setup"
+Dir[File.dirname(__FILE__) + '/../lib/*.rb'].each { |file| require file }
+Bundler.require :default, :test
+set :root, Dir.pwd
+
+require "capybara/rspec"
+Capybara.app = Sinatra::Application
+set(:show_exceptions, false)
+require "./app"
 
 # RSpec.configure do |config|
 #   config.after(:each) do
