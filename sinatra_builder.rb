@@ -39,8 +39,8 @@ class ProjectBuilder
   def build_files
     write_contents project_path, "app.rb", <<-TEXT
 require "bundler/setup"
-Dir[File.dirname(__FILE__) + '/lib/*.rb'].each { |file| require file }
 Bundler.require :default
+Dir[File.dirname(__FILE__) + '/lib/*.rb'].each { |file| require file }
 
 get "/" do
   erb :index
@@ -170,9 +170,9 @@ TEXT
 ENV["RACK_ENV"] = "test"
 
 require "bundler/setup"
-Dir[File.dirname(__FILE__) + '/../lib/*.rb'].each { |file| require file }
 Bundler.require :default, :test
 set :root, Dir.pwd
+Dir[File.dirname(__FILE__) + '/../lib/*.rb'].each { |file| require file }
 
 require "capybara/rspec"
 Capybara.app = Sinatra::Application
